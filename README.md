@@ -7,7 +7,8 @@
  >
  > The author, Frank Jia has kindly given his permission to use this code for my example and I encourage you to follow him on Medium and read his other posts.
 
+This Swift Package is used in the tutorial I created and is posted on YouTube to show you you how to clone and modify a Swift Package for your own use.
 
+Please see the full video and documentation - https://stewartlynch.github.io/SegmentedPicker/
 
-
- 
+![Thumbnail](Thumbnail.jpeg)
