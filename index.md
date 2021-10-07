@@ -14,8 +14,7 @@ In this article, you will learn how to clone a Swift Package from a GitHub repo 
 
 For this exercise, I am going to use code that was produced by *Frank Jia* in his article titled **Build a Custom iOS Segmented Control With SwiftUI** published on **Medium** at https://betterprogramming.pub/custom-ios-segmented-control-with-swiftui-473b386d0b51
 
-I have made only minor modifications to the code to make it compatible as a Swift Package,
-I make no claim to the code, I am using it only as an example for my tutorial.
+I have made only minor modifications to the code to make it compatible as a Swift Package, and to add an accessibility property.  Otherwise, I make no claim to the code, I am using it only as an example for my tutorial.
 
 ### The Swift Package
 
@@ -48,7 +47,7 @@ var colors = ["Red", "Green", "Yellow"]
 Then we replace that Hello World TextView with a Picker that is a segmented picker like this:
 
 `````swift
-Picker("", selection: $selection) {
+Picker("Pick your favorite color", selection: $selection) {
     ForEach(0..<colors.count, id: \.self) { index in
         Text(colors[index]).tag(index)
     }
@@ -101,7 +100,7 @@ When you do this, you see that it has two arguments, an array of string and a bi
 Well that is what we have used already, so
 
 `````swift
-SegmentedPicker(items: colors, selection: $selection)
+SegmentedPicker("Pick your favorite color", items: colors, selection: $selection)
 `````
 
 This is a much nicer implementation and the segmented picker is arguably nicer too.
@@ -111,7 +110,7 @@ What I would like to do is to customize that picker by allow the user to specify
 If we add a background modifier to our Picker right now, it just does not work
 
 `````swift
-SegmentedPicker(items: colors, selection: $selection)
+SegmentedPicker("Pick your favorite color", items: colors, selection: $selection)
     .background(Color.red)
 `````
 
@@ -184,7 +183,8 @@ The first time you edit the file, you will be asked to unlock it.  What we are d
 3. Change the initializer to the following:
 
 `````swift
-public init(items: [String], selection: Binding<Int>, backgroundColor: Color = Color(.secondarySystemBackground)) {
+public init(_ label: String, items: [String], selection: Binding<Int>, backgroundColor: Color = Color(.secondarySystemBackground)) {
+  			self.label = label
         self._selection = selection
         self.items = items
         self.backgroundColor = backgroundColor
@@ -212,3 +212,4 @@ SegmentedPicker(items: colors, selection: $selection, backgroundColor: .green)
 
 The first method is not very "SwiftUI" in that in SwiftUI, you are less likely to pass additional arguments into a View, but rather apply a modifier like "background" that can modify and update the view.
 
+So let's undo everything that you have done in that file
