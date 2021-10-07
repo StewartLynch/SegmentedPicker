@@ -1,6 +1,6 @@
 # Cloning a Swift Package and Modifying It
 
-There are a few reasons why you would want to clone a Swift Package and claim it as your own so that you can modify it.
+[TOC]
 
 You may wish to simply pick through the code so you can get a better understanding of how things are done and improve your skills.  I often do this by altering the code and seeing how it affects things. Or, you may wish to improve upon the package for your own purposes.
 
@@ -152,10 +152,20 @@ You could go to the GitHub reposit and clone the package and add it to your proj
 
 This will add the project in as a framework, but you still need to add the framework to your target.
 
-7. Select your project target and select your project target, and scroll to the **Frameworks, Libraries, and Embedded Content** section .
-8. Click on the **+** and the list of frameworks and libraries will be displayed.  Select your new framework from the workspace section and click on Add and this will add it to your target
+7. Exit your project, then open it again.
+
+8. Select your project target and select your project target, and scroll to the **Frameworks, Libraries, and Embedded Content** section .
+9. Click on the **+** and the list of frameworks and libraries will be displayed.  Select your new framework from the workspace section and click on Add and this will add it to your target
 
 ![image-20211006223104987](Images/image-20211006223104987.png)
+
+10. I have had issues with source control when doing it this way, so I recommend that you remove source control entirely at this point and add it back later.  To remove Source Control:
+
+    1. Open the new framework folder and enter ⌘-⇧-. and that will reveal hidden files.
+    2. Delete the .git folder
+       ![image-20211007114901946](Images/image-20211007114901946.png)
+
+    3. Enter ⌘-S-. once more to hide the hidden files once more
 
 You should now be able to build an run your project just as before.  The difference is that now, you will be able to modify the code.
 
@@ -212,4 +222,161 @@ SegmentedPicker(items: colors, selection: $selection, backgroundColor: .green)
 
 The first method is not very "SwiftUI" in that in SwiftUI, you are less likely to pass additional arguments into a View, but rather apply a modifier like "background" that can modify and update the view.
 
-So let's undo everything that you have done in that file
+So let's undo everything that you have done in that file.
+
+1. change the static BackgroundColor property into a standard var called backgroundColor and this time make sure you include the default color
+
+`````swift
+var backgroundColor: Color = Color(.secondarySystemBackground)
+`````
+
+2. In the body, fix the error that is now displayed, by changing the background modifier.
+
+`````swift
+.background(backgroundColor)
+`````
+
+3. Create a new Public function called .backgroundColor that has a color property as an argument and returns a SegementedPicker view.
+
+`````swift
+public func background(_ color: Color) -> SegmentedPicker {
+
+}
+`````
+
+4. In the body of the function create a property called view and assign self to it, then apply the background modifier with the color to it and return it
+
+`````swift
+public func backgroundColor(_ color: Color) -> SegmentedPicker {
+    var view = self
+    view.backgroundColor = color
+    return view
+}
+`````
+
+5. Return now to the contentView and remove the now, not accessible backgroundColor from the initializer and add a new .background modfier to the SegmentedPicker view passing in some color
+
+`````swift
+  SegmentedPicker("Pick your favorite color.", items: colors, selection: $selection)
+    .backgroundColor(.green)
+`````
+
+That's it.
+
+### Working with a ViewModel
+
+If you want to work with a viewModel and an Observable object, then let's see how we can do that here.
+
+1. Create a new swift file called **MyColor** and create a struct that we can use as our model and change the import to **SwiftUI**
+
+   `````swift
+   import SwiftUI
+   struct MyColor {
+       var name: String
+       var color: Color
+   }
+   `````
+
+2. Inside the struct, create a static property called AllColors that returns an array of these colors like this:
+
+   `````swift
+   static var mockColors: [MyColor] {
+       [
+           MyColor(name: "Red", color: .red),
+           MyColor(name: "Green", color: .green),
+           MyColor(name: "Yellow", color: .yellow)
+       ]
+   }
+   `````
+
+3. Create a new swift file called ViewModel and create a class called ViewModel that conforms to the ObservableObject protocol.  Also change the import to SwiftUI
+
+   `````swift
+   import SwiftUI
+   
+   class ViewModel: ObservableObject {
+       
+   }
+   `````
+
+4. Create a property call colors that is an array of MyColor and assign it mockColors
+
+   `````swift
+   var colors:[MyColor] = []
+   `````
+
+   **Note:** if you are going to be updating this from your view,  it should be decorated with the @Published property wrapper and created as a var, but we are not, so we can just leave it as a constant
+
+5. Create an initializer that will assign the MyColor.mockColors to this property
+
+   `````swift
+   init() {
+       colors = MyColor.mockColors
+   }
+   `````
+
+6. Create a Published property called selection, that is an Int, initialized at 0
+
+   `````swift
+   @Published var selection: Int = 0
+   `````
+
+7. Create another var that is called names and initialize it as an empty array of string
+
+   `````swift
+   var names = [String]()
+   `````
+
+8. In the initializer, map the names from colors array to that property
+
+   `````swift
+   init() {
+       colors = MyColor.mockColors
+       names = colors.map{$0.name}
+   }
+   `````
+
+9. Create one more computed property called selectedColor of type Color and assign it the color of the selection item of the colors array.
+
+   `````swift
+   var selectedColor: Color {
+       colors[selection].color
+   }
+   `````
+
+10. Return to ContentView now and replace the two properties with a single StateObject to initialize the viewModel
+
+    `````swift
+    @StateObject var vm = ViewModel()
+    `````
+
+11. Use the Viewmodel properites now for the SegmentedPicker
+
+    `````swift
+     SegmentedPicker("Pick your favorite color.", items: vm.names, selection: $vm.selection)
+    `````
+
+12. Assign the computed viewmodel color property to the background
+
+`````swift
+.background(vm.selectedColor)
+`````
+
+Now, when you enter preview mode, and select a segment, the background of the picker will take on the color of the selected segment.
+
+Nice, simple and readable code.
+
+`````swift
+struct ContentView: View {
+    @StateObject var vm = ViewModel()
+    
+    var body: some View {
+        SegmentedPicker("Pick your favorite color.", items: vm.names, selection: $vm.selection)
+            .background(vm.selectedColor)
+            .padding()
+    }
+}
+`````
+
+
+
