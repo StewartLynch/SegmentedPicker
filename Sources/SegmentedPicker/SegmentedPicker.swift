@@ -39,11 +39,12 @@ public struct SegmentedPicker: View {
                 .animation(Animation.linear(duration: SegmentedPicker.AnimationDuration))
                 .eraseToAnyView()
     }
-    
+    private var label: String
     @Binding private var selection: Int
     private let items: [String]
     
-    public init(items: [String], selection: Binding<Int>) {
+    public init(_ label: String, items: [String], selection: Binding<Int>) {
+        self.label = label
         self._selection = selection
         self.items = items
     }
@@ -62,6 +63,7 @@ public struct SegmentedPicker: View {
         .padding(SegmentedPicker.PickerPadding)
         .background(SegmentedPicker.BackgroundColor)
         .clipShape(RoundedRectangle(cornerRadius: SegmentedPicker.SegmentCornerRadius))
+        .accessibilityLabel(Text(label))
     }
 
     // Helper method to compute the offset based on the selected index
@@ -97,7 +99,6 @@ public struct SegmentedPicker: View {
     }
 }
 
-
 extension View {
     func eraseToAnyView() -> AnyView {
         AnyView(self)
@@ -121,6 +122,7 @@ struct BackgroundGeometryReader: View {
         }
     }
 }
+
 struct SizeAwareViewModifier: ViewModifier {
     @Binding private var viewSize: CGSize
     init(viewSize: Binding<CGSize>) {
@@ -135,9 +137,8 @@ struct SizeAwareViewModifier: ViewModifier {
 }
 
 struct SegmentedPicker_Previews: PreviewProvider {
-
     static var previews: some View {
-        SegmentedPicker(items: ["M", "T", "W", "T", "F"], selection: .constant(0))
+        SegmentedPicker("Pick a day", items: ["M", "T", "W", "T", "F"], selection: .constant(0))
             .padding()
     }
 }
