@@ -122,7 +122,7 @@ If you read Frank's article you will see how he created this custom picker.
 
 If we drill down to the SegmentedPicker source, we can see that there is a private static property called **BackgroundColor** that is assigned as the background for the custom picker.
 
-What we want to be able to do is to modify that color so it can't be static, buy when you try to do this, you will find that it is not possible.
+What we want to be able to do is to modify that color so it can't be a `static` property.  However, when you try to do this, you will find that it is not possible.
 
 Swift Packages are not modifiable.  You need to "own" the framework and that is what the whole point of this tutorial is all about.
 
